@@ -1,0 +1,13 @@
+[package]
+name = "dyadikos-math"
+version = "0.0.1"
+edition = "2021"
+license = "MIT"
+
+[dependencies]
+glam = "0.20.5"
+serde = { version = "1.0.137", features = ["derive"], optional = true }
+bytemuck = { version = "1.9.1", features = ["derive"] }
+
+[features]
+serialize = ["serde"]
