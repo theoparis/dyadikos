@@ -5,7 +5,7 @@ edition = "2021"
 license = "MIT"
 
 [dependencies]
-glam = "0.20.5"
+glam = "0.21.2"
 serde = { version = "1.0.137", features = ["derive"], optional = true }
 bytemuck = { version = "1.9.1", features = ["derive"] }
 
