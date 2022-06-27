@@ -5,7 +5,7 @@ edition = "2021"
 license = "MIT"
 
 [dependencies]
-anyhow = "1.0.57"
+anyhow = "1.0.58"
 tracing = "0.1.35"
 dyadikos-math = { path = "../math" }
 wgpu = { git = "https://github.com/gfx-rs/wgpu", rev = "f2c3d428181dad61f48661b92e262c2ec3c2f93d" }
@@ -19,7 +19,7 @@ winit = { version = "0.26.1" }
 
 [dev-dependencies]
 tracing-subscriber = { version = "0.3.11", features = ["env-filter"] }
-glam = { version = "0.20.5", features = ["serde"] }
+glam = { version = "0.21.2", features = ["serde"] }
 tokio = { version = "1.19.2", features = ["full"] }
 
 [features]
