@@ -5,22 +5,22 @@ edition = "2021"
 license = "MIT"
 
 [dependencies]
-anyhow = "1.0.58"
-tracing = "0.1.35"
+anyhow = "1.0.60"
+tracing = "0.1.36"
 dyadikos-math = { path = "../math" }
 wgpu = { git = "https://github.com/gfx-rs/wgpu", rev = "f2c3d428181dad61f48661b92e262c2ec3c2f93d" }
-bytemuck = { version = "1.9.1", features = ["derive"] }
+bytemuck = { version = "1.11.0", features = ["derive"] }
 typed-arena = "2.0.1"
 
 [target.'cfg(not(target_arch = "wasm32"))'.dependencies]
-winit = { version = "0.26.1" }
+winit = { version = "0.27.1" }
 
 [target.'cfg(target_arch = "wasm32")'.dependencies]
 
 [dev-dependencies]
-tracing-subscriber = { version = "0.3.11", features = ["env-filter"] }
-glam = { version = "0.21.2", features = ["serde"] }
-tokio = { version = "1.19.2", features = ["full"] }
+tracing-subscriber = { version = "0.3.15", features = ["env-filter"] }
+glam = { version = "0.21.3", features = ["serde"] }
+tokio = { version = "1.20.1", features = ["full"] }
 
 [features]
 default = []
