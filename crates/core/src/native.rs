@@ -123,7 +123,7 @@ impl App for NativeApp {
 							let mut rpass = encoder.begin_render_pass(
 								&RenderPassDescriptor {
 									label: None,
-									color_attachments: &[
+									color_attachments: &[Some(
 										RenderPassColorAttachment {
 											view: &view,
 											resolve_target: None,
@@ -135,7 +135,7 @@ impl App for NativeApp {
 												store: true,
 											},
 										},
-									],
+									)],
 									depth_stencil_attachment: None,
 								},
 							);
@@ -222,11 +222,9 @@ impl NativeApp {
 				push_constant_ranges: &[],
 			});
 
-		let swapchain_format = surface
-			.get_preferred_format(&adapter)
-			.context("Failed to get preferred format")?;
+		let swapchain_format = surface.get_supported_formats(&adapter)[0];
 
-		let shader = device.create_shader_module(&ShaderModuleDescriptor {
+		let shader = device.create_shader_module(ShaderModuleDescriptor {
 			label: None,
 			source: ShaderSource::Wgsl(Cow::Borrowed(&settings.shader)),
 		});
@@ -253,7 +251,7 @@ impl NativeApp {
 				fragment: Some(FragmentState {
 					module: &shader,
 					entry_point: "fs_main",
-					targets: &[swapchain_format.into()],
+					targets: &[Some(swapchain_format.into())],
 				}),
 				primitive: PrimitiveState::default(),
 				depth_stencil: None,
