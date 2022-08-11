@@ -1,0 +1,12 @@
+pipeline:
+  lint:
+    image: ghcr.io/greyltc-org/archlinux-aur:paru
+    commands:
+      - aur-install rust-nightly-bin vulkan-devel mold
+      - mold -run cargo clippy -- -Dwarnings
+      - mold -run cargo fmt -- --check
+  build:
+    image: ghcr.io/greyltc-org/archlinux-aur:paru
+    commands:
+      - aur-install rust-nightly-bin vulkan-devel mold
+      - mold -run cargo build --release
