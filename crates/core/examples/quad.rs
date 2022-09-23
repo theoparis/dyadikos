@@ -1,6 +1,6 @@
 use dyadikos_core::{mesh::Mesh, native::NativeApp, App, AppSettings};
-use dyadikos_math::{transform::RenderTransformation, Vertex};
-use glam::{Mat4, Vec3};
+use dyadikos_math::{transform::ProjectionTransform, Vertex};
+use nalgebra::{Matrix4, Vector3};
 use wgpu::Color;
 
 #[tokio::main]
@@ -38,18 +38,12 @@ async fn main() -> anyhow::Result<()> {
 	})
 	.await?;
 
-	let mut transform = RenderTransformation::default();
+	let mut transform = ProjectionTransform::default();
 	transform.proj =
-		Mat4::perspective_rh(60.0_f32.to_radians(), 1.0, 0.01, 1000.0);
-	transform.view = Mat4::look_at_rh(
-		Vec3::new(0.0, 0.0, 1.0),
-		Vec3::new(0.0, 0.0, 0.0),
-		Vec3::new(0.0, -1.0, 0.0),
-	);
-	transform.model = Mat4::from_scale(Vec3::new(1.0, 1.0, 1.0));
-
-	let matrix =
-		(transform.proj * transform.view * transform.model).to_cols_array();
+		Matrix4::new_perspective(60.0_f32.to_radians(), 1.0, 0.01, 1000.0);
+	transform.view = Matrix4::new_translation(&Vector3::new(0.0, 0.0, -5.0));
+	transform.model = Matrix4::identity();
+	let matrix = transform.proj * transform.view * transform.model;
 
 	let vertices = vec![
 		Vertex {
@@ -68,17 +62,9 @@ async fn main() -> anyhow::Result<()> {
 	let indices = vec![0, 1, 3, 1, 2, 3];
 	let mut mesh = Mesh::new(&app, vertices, indices);
 
-	app.clone().run(
-		&matrix,
-		Box::new(move |rpass, uniform_buffer| {
-			app.queue.write_buffer(
-				uniform_buffer,
-				0,
-				bytemuck::cast_slice(&[matrix]),
-			);
-			mesh.render(rpass);
-		}),
-	);
+	app.clone().run(Box::new(move |render_pass| {
+		mesh.render(render_pass, &app, &matrix);
+	}));
 
 	Ok(())
 }

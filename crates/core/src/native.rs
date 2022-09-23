@@ -1,20 +1,19 @@
 use crate::{App, AppSettings, ArcRenderPass, RenderCallback};
 use anyhow::{Context, Result};
-use dyadikos_math::{Matrix4, Vertex};
+use dyadikos_math::Vertex;
 use std::{
 	borrow::Cow,
 	sync::{Arc, Mutex, RwLock},
 };
 use typed_arena::Arena;
 use wgpu::{
-	util::DeviceExt, Backends, BindGroup, BindGroupLayout,
-	CommandEncoderDescriptor, Device, DeviceDescriptor, FragmentState,
-	Instance, Limits, LoadOp, MultisampleState, Operations,
-	PipelineLayoutDescriptor, PowerPreference, PresentMode, PrimitiveState,
-	Queue, RenderPassColorAttachment, RenderPassDescriptor, RenderPipeline,
-	RenderPipelineDescriptor, RequestAdapterOptions, ShaderModuleDescriptor,
-	ShaderSource, Surface, SurfaceConfiguration, TextureUsages,
-	TextureViewDescriptor, VertexState,
+	Backends, BindGroupLayout, CommandEncoderDescriptor, Device,
+	DeviceDescriptor, FragmentState, Instance, Limits, LoadOp,
+	MultisampleState, Operations, PipelineLayoutDescriptor, PowerPreference,
+	PresentMode, PrimitiveState, Queue, RenderPassColorAttachment,
+	RenderPassDescriptor, RenderPipeline, RenderPipelineDescriptor,
+	RequestAdapterOptions, ShaderModuleDescriptor, ShaderSource, Surface,
+	SurfaceConfiguration, TextureUsages, TextureViewDescriptor, VertexState,
 };
 use winit::{
 	event::{Event, WindowEvent},
@@ -33,7 +32,6 @@ pub struct NativeApp {
 	pub queue: Arc<Queue>,
 	pub settings: AppSettings,
 	pub render_pipeline: Arc<RenderPipeline>,
-	pub bind_group: Option<Arc<BindGroup>>,
 	pub bind_group_layout: Arc<BindGroupLayout>,
 }
 
@@ -50,8 +48,8 @@ impl App for NativeApp {
 		&self.render_pipeline
 	}
 
-	fn get_bind_group(&self) -> &BindGroup {
-		self.bind_group.as_ref().unwrap()
+	fn get_queue(&self) -> &Queue {
+		&self.queue
 	}
 
 	fn get_window_size(&self) -> (u32, u32) {
@@ -60,16 +58,11 @@ impl App for NativeApp {
 		(size.width, size.height)
 	}
 
-	fn run(mut self, matrix: &Matrix4, mut callback: Box<RenderCallback>) {
-		let mut uniform_buffer =
-			self.device
-				.create_buffer_init(&wgpu::util::BufferInitDescriptor {
-					label: Some("Uniform Buffer"),
-					contents: bytemuck::cast_slice(matrix),
-					usage: wgpu::BufferUsages::UNIFORM
-						| wgpu::BufferUsages::COPY_DST,
-				});
+	fn get_bind_group_layout(&self) -> &BindGroupLayout {
+		&self.bind_group_layout
+	}
 
+	fn run(&self, mut callback: Box<RenderCallback>) {
 		self.event_loop.try_write().unwrap().run_return(
 			move |event, _, control_flow| {
 				let config = self.config.clone();
@@ -103,24 +96,11 @@ impl App for NativeApp {
 							.texture
 							.create_view(&TextureViewDescriptor::default());
 
-						self.bind_group =
-							Some(Arc::new(device.create_bind_group(
-								&wgpu::BindGroupDescriptor {
-									layout: &self.bind_group_layout,
-									entries: &[wgpu::BindGroupEntry {
-										binding: 0,
-										resource:
-											uniform_buffer.as_entire_binding(),
-									}],
-									label: None,
-								},
-							)));
-
 						let mut encoder = self.device.create_command_encoder(
 							&CommandEncoderDescriptor { label: None },
 						);
 						{
-							let mut rpass = encoder.begin_render_pass(
+							let mut render_pass = encoder.begin_render_pass(
 								&RenderPassDescriptor {
 									label: None,
 									color_attachments: &[Some(
@@ -139,19 +119,15 @@ impl App for NativeApp {
 									depth_stencil_attachment: None,
 								},
 							);
-							rpass.set_pipeline(&self.render_pipeline);
+              render_pass.set_pipeline(&self.render_pipeline);
 
-							let mut rpass = ArcRenderPass {
-								arena: &Arena::new(),
-								render_pass: rpass,
+							let mut arena = Arena::new();
+							let arc_render_pass = ArcRenderPass {
+								render_pass,
+								arena: &mut arena,
 							};
-							rpass.set_bind_group(
-								0,
-								self.bind_group.as_ref().unwrap(),
-								&[],
-							);
 
-							callback(rpass, &mut uniform_buffer);
+							callback(arc_render_pass);
 						}
 
 						self.queue.submit(Some(encoder.finish()));
@@ -277,7 +253,7 @@ impl NativeApp {
 			config: Arc::new(Mutex::new(config)),
 			render_pipeline: Arc::new(render_pipeline),
 			queue: Arc::new(queue),
-			bind_group: None,
+			// bind_group: None,
 			bind_group_layout: Arc::new(bind_group_layout),
 			settings,
 		})

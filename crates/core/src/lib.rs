@@ -1,12 +1,11 @@
-use dyadikos_math::Matrix4;
 use std::{ops::Range, sync::Arc};
 use typed_arena::Arena;
 use wgpu::{
-	BindGroup, Buffer, Color, Device, DynamicOffset, Features, IndexFormat,
-	PrimitiveState, RenderPass, RenderPipeline,
+	BindGroup, BindGroupLayout, Buffer, Color, Device, DynamicOffset, Features,
+	IndexFormat, PrimitiveState, RenderPass, RenderPipeline, Queue,
 };
 
-pub type RenderCallback = dyn FnMut(ArcRenderPass, &mut Buffer);
+pub type RenderCallback = dyn FnMut(ArcRenderPass);
 
 #[derive(Debug, Clone, Default)]
 pub struct AppSettings {
@@ -21,8 +20,10 @@ pub trait App {
 	fn get_settings(&self) -> &AppSettings;
 	fn get_device(&self) -> &Device;
 	fn get_pipeline(&self) -> &RenderPipeline;
-	fn get_bind_group(&self) -> &BindGroup;
-	fn run(self, matrix: &Matrix4, callback: Box<RenderCallback>);
+	// fn get_bind_group(&self) -> &BindGroup;
+  fn get_queue(&self) -> &Queue;
+	fn get_bind_group_layout(&self) -> &BindGroupLayout;
+	fn run(&self, callback: Box<RenderCallback>);
 }
 
 pub struct ArcRenderPass<'a> {
