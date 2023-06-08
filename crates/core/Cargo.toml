@@ -5,12 +5,12 @@ edition = "2021"
 license = "MIT"
 
 [dependencies]
-anyhow = "1.0.60"
-tracing = "0.1.36"
+anyhow = "1.0.71"
+tracing = "0.1.37"
 dyadikos-math = { path = "../math" }
 wgpu = { git = "https://github.com/gfx-rs/wgpu" }
-bytemuck = { version = "1.11.0", features = ["derive"] }
-typed-arena = "2.0.1"
+bytemuck = { version = "1.13.1", features = ["derive"] }
+typed-arena = "2.0.2"
 
 [target.'cfg(not(target_arch = "wasm32"))'.dependencies]
 winit = { git = "https://github.com/rust-windowing/winit" }
@@ -18,9 +18,9 @@ winit = { git = "https://github.com/rust-windowing/winit" }
 [target.'cfg(target_arch = "wasm32")'.dependencies]
 
 [dev-dependencies]
-tracing-subscriber = { version = "0.3.15", features = ["env-filter"] }
-glam = { version = "0.21.3", features = ["serde"] }
-tokio = { version = "1.20.1", features = ["full"] }
+tracing-subscriber = { version = "0.3.17", features = ["env-filter"] }
+glam = { version = "0.24.0", features = ["serde"] }
+tokio = { version = "1.28.2", features = ["full"] }
 
 [features]
 default = []
