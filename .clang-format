@@ -1,14 +1,17 @@
 ---
-Language: Cpp
-IndentWidth: 4
-TabWidth: 4
-AccessModifierOffset: -2
-UseTab: Always
-AlignAfterOpenBracket: Align
-BreakBeforeBraces: Attach
-AllowShortIfStatementsOnASingleLine: true
-IndentCaseLabels: true
-IndentAccessModifiers: true
-IndentExternBlock: true
-NamespaceIndentation: All
-SortIncludes: false
+BasedOnStyle: LLVM
+
+# ---
+# Language: Cpp
+# IndentWidth: 4
+# TabWidth: 4
+# AccessModifierOffset: -2
+# UseTab: Always
+# AlignAfterOpenBracket: Align
+# BreakBeforeBraces: Attach
+# AllowShortIfStatementsOnASingleLine: true
+# IndentCaseLabels: true
+# IndentAccessModifiers: true
+# IndentExternBlock: true
+# NamespaceIndentation: All
+# SortIncludes: false

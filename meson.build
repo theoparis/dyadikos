@@ -1,55 +1,39 @@
-project('dyadikos', 'cpp', default_options : ['cpp_std=c++17'])
-
-if get_option('buildtype').startswith('debug')
-  add_project_arguments('-DDEBUG', language : 'cpp')
-endif
+project(
+    'dyadikos',
+    'c',
+    default_options: [
+        'c_std=c2x',
+        'warning_level=3',
+        'b_lto=true',
+        'buildtype=debugoptimized',
+    ],
+)
 
 inc = include_directories('src')
 
-src = [
-  'src/app.hpp',
-  'src/transform.hpp',
-  'src/camera.hpp',
-  'src/model.hpp',
-]
-
 # dependencies
-dep_glfw = dependency('glfw3')
-dep_spdlog = dependency('spdlog')
-dep_fmt = dependency('fmt')
+dep_cglm = dependency('cglm', fallback: ['cglm', 'cglm_dep'])
+# dep_flecs = dependency('flecs', fallback: ['flecs', 'flecs_dep'])
 dep_vk = dependency('vulkan')
-dep_assimp = dependency('assimp')
+dep_xcb = dependency('xcb')
 
-libdyadikos = static_library(
-  'dyadikos',
-  sources: src,
-  dependencies: [
-    dep_glfw,
-    dep_spdlog,
-    dep_fmt,
-    dep_vk,
-    dep_assimp,
-  ],
-  install: true,
-  include_directories: inc
+libdyadikos = library(
+    'dyadikos',
+    'src/clay.c',
+    'src/window.c',
+    dependencies: [dep_cglm, dep_vk, dep_xcb],
+    install: true,
+    include_directories: inc,
+    c_args: ['-D_DEFAULT_SOURCE'],
 )
 libdyadikos_dep = declare_dependency(
-  include_directories: inc,
-  link_with: libdyadikos,
-  dependencies: [
-    dep_glfw,
-    dep_spdlog,
-    dep_fmt,
-    dep_vk,
-    dep_assimp,
-  ],
+    include_directories: inc,
+    link_with: libdyadikos,
 )
 
 executable(
-  'dyadikos',
-  sources: ['src/main.cpp'],
-  dependencies: [
-    libdyadikos_dep
-  ],
-  install: true,
+    'dyadikos',
+    sources: ['src/main.c'],
+    dependencies: [libdyadikos_dep],
+    install: true,
 )
