@@ -1,53 +1,53 @@
-#pragma once
-#include "app.hpp"
-#include <spdlog/spdlog.h>
-#include <string>
-#include <vector>
-#include <assimp/Importer.hpp>
-#include <assimp/scene.h>
-#include <assimp/postprocess.h>
+// #pragma once
+// #include <assimp/postprocess.h>
+// #include <assimp/scene.h>
+// #include <spdlog/spdlog.h>
 
-namespace dyadikos::model {
-	void processNode(aiNode *node, const aiScene *scene,
-					 std::vector<Vertex> &vertices) {
-		// process all the node's meshes (if any)
-		for (unsigned int i = 0; i < node->mNumMeshes; i++) {
-			aiMesh *mesh = scene->mMeshes[node->mMeshes[i]];
+// #include <assimp/Importer.hpp>
+// #include <string>
+// #include <vector>
 
-			for (unsigned int i = 0; i < mesh->mNumFaces; i++) {
-				const aiFace &face = mesh->mFaces[i];
+// namespace dyadikos::model {
+// void processNode(aiNode *node, const aiScene *scene,
+// 		 std::vector<Vertex> &vertices) {
+//   // process all the node's meshes (if any)
+//   for (unsigned int i = 0; i < node->mNumMeshes; i++) {
+//     aiMesh *mesh = scene->mMeshes[node->mMeshes[i]];
 
-				for (int j = 0; j < face.mNumIndices; j++) {
-					const aiVector3D v = mesh->mVertices[face.mIndices[j]];
+//     for (unsigned int i = 0; i < mesh->mNumFaces; i++) {
+//       const aiFace &face = mesh->mFaces[i];
 
-					Vertex vertex{
-						glm::vec3(v.x, v.z, v.y),
-						glm::vec3(1.0f, 1.0f, 1.0f),
-					};
+//       for (int j = 0; j < face.mNumIndices; j++) {
+// 	const aiVector3D v = mesh->mVertices[face.mIndices[j]];
 
-					vertices.push_back(vertex);
-				}
-			}
-		}
-		// then do the same for each of its children
-		for (unsigned int i = 0; i < node->mNumChildren; i++) {
-			processNode(node->mChildren[i], scene, vertices);
-		}
-	}
+// 	Vertex vertex{
+// 	    glm::vec3(v.x, v.z, v.y),
+// 	    glm::vec3(1.0f, 1.0f, 1.0f),
+// 	};
 
-	auto loadModel(const char *path) -> std::vector<Vertex> {
-		Assimp::Importer importer;
-		auto scene = importer.ReadFile(path, aiProcess_Triangulate);
+// 	vertices.push_back(vertex);
+//       }
+//     }
+//   }
+//   // then do the same for each of its children
+//   for (unsigned int i = 0; i < node->mNumChildren; i++) {
+//     processNode(node->mChildren[i], scene, vertices);
+//   }
+// }
 
-		if (!scene || scene->mFlags & AI_SCENE_FLAGS_INCOMPLETE ||
-			!scene->mRootNode) {
-			throw std::runtime_error(importer.GetErrorString());
-		}
+// auto loadModel(const char *path) -> std::vector<Vertex> {
+//   Assimp::Importer importer;
+//   auto scene = importer.ReadFile(path, aiProcess_Triangulate);
 
-		std::vector<Vertex> vertices;
+//   if (!scene || scene->mFlags & AI_SCENE_FLAGS_INCOMPLETE ||
+//       !scene->mRootNode) {
+//     throw std::runtime_error(importer.GetErrorString());
+//   }
 
-		processNode(scene->mRootNode, scene, vertices);
+//   std::vector<Vertex> vertices;
 
-		return vertices;
-	}
-} // namespace dyadikos::model
+//   processNode(scene->mRootNode, scene, vertices);
+
+//   return vertices;
+// }
+// }  // namespace dyadikos::model

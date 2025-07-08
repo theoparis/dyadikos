@@ -1,6 +1,6 @@
 # Dyadikos
 
-Dyadikos is a game engine written in C++ 17.
+Dyadikos is a game engine written in C++26.
 It is made to be simple and easy-to-use.
 
 ## Usage
@@ -9,10 +9,9 @@ It is made to be simple and easy-to-use.
 
 ## Compiling
 
-You need a C++17 compatible compiler, as well as ninja and meson. In terms of dependencies you also need to have glm, spdlog, and glfw installed on your system.
+You need a C++26 compatible compiler such as Clang, as well as Ninja and CMake 4.x.
 
 ```sh
-meson build
-ninja -C build
+cmake -B build -G Ninja -DCMAKE_BUILD_TYPE=Debug -DCMAKE_C_COMPILER=clang -DCMAKE_CXX_COMPILER=clang++
+cmake --build build
 ```
-
